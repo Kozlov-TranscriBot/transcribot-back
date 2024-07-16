@@ -1,19 +1,16 @@
-use std::{collections::HashMap, env::args, fs::File, io::Read};
+use axum::{extract, response::Html, routing, Router};
+use serde::{Deserialize, Serialize};
 
-use axum::{extract, http::response, response::Html, routing, Router};
-use tower_http::services::ServeDir;
-use serde::Deserialize;
-
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct UserContent {
-    id: u64,
+    id: u32,
     content: String,
 }
 
 async fn handle_audio(
     extract::Json(data): extract::Json<UserContent>
 ) -> Html<String> {
-    Html(String::from("OK"))
+    Html(format!("Content {} from user {}", data.content, data.id))
 }
 
 fn set_router() -> Router {
