@@ -23,7 +23,7 @@ async fn upload(requset_query: extract::Query<RequestQuery>, mut multipart: extr
     {
         if field.name().expect("Field name doesn't found").contains("file") {
             if let Ok(bytes) = field.bytes().await {
-                let file_name = format!("./{}", requset_query.id);
+                let file_name = format!("/tmp/transcribot-back/{}", requset_query.id);
                 let mut audio_file = File::create_new(file_name.clone()).map_err(|_| (
                     StatusCode::TOO_MANY_REQUESTS, String::from("Please wait till previous file will be processed")
                 ))?;
