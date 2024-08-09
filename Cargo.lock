@@ -849,13 +849,8 @@ dependencies = [
  "tokio",
  "tower",
  "tower-http",
- "transcribot-whisper-wrapper",
+ "whisper-wrapper",
 ]
-
-[[package]]
-name = "transcribot-whisper-wrapper"
-version = "0.2.0"
-source = "git+https://github.com/Kozlov-TranscriBot/transcribot-whisper-wrapper#1adcb3f83380e8fe9d9bb208f9e25d851f7be98d"
 
 [[package]]
 name = "unicase"
@@ -883,6 +878,11 @@ name = "wasi"
 version = "0.11.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
+
+[[package]]
+name = "whisper-wrapper"
+version = "0.3.0"
+source = "git+https://github.com/Kozlov-TranscriBot/transcribot-whisper-wrapper#7790ccbe0767b76211914d354436606aefaa9e35"
 
 [[package]]
 name = "windows-sys"

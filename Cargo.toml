@@ -20,4 +20,4 @@ serde = { version = "1.0", features = ["derive"] }
 # Each data format lives in its own crate; the sample code below uses JSON
 # but you may be using a different one.
 serde_json = "1.0"
-transcribot-whisper-wrapper = { git = "https://github.com/Kozlov-TranscriBot/transcribot-whisper-wrapper", version = "0.2.0" }
+whisper-wrapper = { git = "https://github.com/Kozlov-TranscriBot/transcribot-whisper-wrapper" }

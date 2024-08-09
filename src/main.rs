@@ -1,4 +1,4 @@
-use std::{fmt::Debug, fs::{remove_file, DirBuilder, File}, io::Write};
+use std::{env::args, fs::{remove_file, DirBuilder, File}, io::Write};
 
 use axum::{
     extract::{self, DefaultBodyLimit}, 
@@ -8,7 +8,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
-use transcribot_whisper_wrapper::WhisperArgs;
+use whisper_wrapper::WhisperArgs;
 
 #[derive(Serialize, Deserialize)]
 struct RequestQuery {
@@ -23,7 +23,6 @@ async fn upload(requset_query: extract::Query<RequestQuery>, mut multipart: extr
         .await
         .map_err(|err| (StatusCode::BAD_REQUEST, format!("{}\n{}", err.body_text(), err.to_string())))?
     {
-        println!("{}", field.name().expect("Field name doesn't found"));
         if field.name().expect("Field name doesn't found").contains("file") {
             if let Ok(bytes) = field.bytes().await {
                 let file_name = format!("{}/{}", TMP_DIR_PATH, requset_query.id);
@@ -32,9 +31,10 @@ async fn upload(requset_query: extract::Query<RequestQuery>, mut multipart: extr
                 ))?;
                 audio_file.write(&bytes).expect("Failed to write data");
                 println!("File saved");
+                let args: Vec<String> = args().collect();
                 let w_args = WhisperArgs::new(
-                    String::from("ru"), file_name.clone()
-                );
+                    args[1].clone(), String::from("ru"), file_name.clone()
+                ).map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?;
                 let res = w_args.run_whisper().map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?;
                 remove_file(file_name).map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?;
                 return Ok(res);
@@ -53,6 +53,8 @@ fn set_router() -> Router {
 
 #[tokio::main]
 async fn main() {
+    // TODO: Add model size checking
+
     DirBuilder::new()
         .recursive(true)
         .create(TMP_DIR_PATH).expect("Couldn't create tmp dir");
