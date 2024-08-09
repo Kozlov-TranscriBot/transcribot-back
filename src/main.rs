@@ -1,7 +1,7 @@
-use std::{fs::{remove_file, DirBuilder, File}, io::Write};
+use std::{fmt::Debug, fs::{remove_file, DirBuilder, File}, io::Write};
 
 use axum::{
-    extract, 
+    extract::{self, DefaultBodyLimit}, 
     http::StatusCode, 
     routing, 
     Router
@@ -21,8 +21,9 @@ async fn upload(requset_query: extract::Query<RequestQuery>, mut multipart: extr
     while let Some(field) = multipart
         .next_field()
         .await
-        .map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?
+        .map_err(|err| (StatusCode::BAD_REQUEST, format!("{}\n{}", err.body_text(), err.to_string())))?
     {
+        println!("{}", field.name().expect("Field name doesn't found"));
         if field.name().expect("Field name doesn't found").contains("file") {
             if let Ok(bytes) = field.bytes().await {
                 let file_name = format!("{}/{}", TMP_DIR_PATH, requset_query.id);
@@ -47,6 +48,7 @@ async fn upload(requset_query: extract::Query<RequestQuery>, mut multipart: extr
 fn set_router() -> Router {
     Router::new()
         .route("/", routing::post(upload))
+        .layer(DefaultBodyLimit::max(21 * 1024 * 1024)) // Max size: 21 MB
 }
 
 #[tokio::main]
