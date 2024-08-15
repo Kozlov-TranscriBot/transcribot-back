@@ -12,7 +12,8 @@ use whisper_wrapper::WhisperArgs;
 
 #[derive(Serialize, Deserialize)]
 struct RequestQuery {
-    id: u32
+    id: u32,
+    lang: String
 }
 
 const TMP_DIR_PATH: &str = "/tmp/transcribot-back";
@@ -33,7 +34,7 @@ async fn upload(requset_query: extract::Query<RequestQuery>, mut multipart: extr
                 println!("File saved");
                 let args: Vec<String> = args().collect();
                 let w_args = WhisperArgs::new(
-                    args[1].clone(), String::from("ru"), file_name.clone()
+                    args[1].clone(), requset_query.lang.clone(), file_name.clone()
                 ).map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?;
                 let res = w_args.run_whisper().map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?;
                 remove_file(file_name).map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?;
